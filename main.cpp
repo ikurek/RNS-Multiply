@@ -2,11 +2,12 @@
 #include <vector>
 #include "Conversions.h"
 #include "MRNMultiply.h"
+#include <string>
 
 using namespace std;
 
 // Vectors for modules
-vector<long> modules = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61};
+vector<long> modules = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31}; //37, 41, 43, 47, 53, 59, 61
 vector<long> modulesReversed;
 
 // Number of modules for fractional part
@@ -26,6 +27,14 @@ vector<long> intermediateProductReversed;
 
 // Parameters required for MRN conversion
 vector<long> mrnConversionParameters;
+unsigned long long MRNnumber;
+vector<long> MRNtoRNS;
+unsigned long long truncatedMRN;
+vector<long> MRNtoRNStrunc;
+
+
+double check;
+
 
 // Works
 void printVector(vector<long> vectorToPrint) {
@@ -94,7 +103,7 @@ int main() {
 
     // Reverse intermediate product
     intermediateProductReversed = intermediateProduct;
-    reverse(intermediateProductReversed.begin(), intermediateProductReversed.end());
+	reverse(intermediateProductReversed.begin(), intermediateProductReversed.end());
 
     // Print intermediate product
     cout << endl;
@@ -115,15 +124,31 @@ int main() {
 
     if (continueConfirmation != "y")
         return 0;
-
     // Calculate parameters for MRN conversions
     // Method prints itself
-    mrnConversionParameters = MRNMultiply::calculateRNStoMRNConversionParameters(modules, modulesReversed,
-                                                                                 intermediateProductReversed);
+    mrnConversionParameters = MRNMultiply::calculateRNStoMRNConversionParameters(modules, intermediateProductReversed);
 
+	//mrn convesrion
+	MRNnumber = MRNMultiply::calculateMRNnumber(modules, intermediateProductReversed, mrnConversionParameters);
+	cout <<"    == > MRN Number: " << MRNnumber<<endl;
+	MRNtoRNS = Conversions::machineValueToRNS(MRNnumber, modulesReversed);
+	cout << "Product (MRN) in RNS:" << endl;
+	cout << "    ==> : ";
+	printVector(MRNtoRNS);
+	cout << endl;
+	//truncate
+	truncatedMRN = Conversions::truncatedMRN(MRNnumber, fractionalPartLength, modules);
+	MRNtoRNStrunc = Conversions::machineValueToRNS(truncatedMRN, modulesReversed);
+	cout << "Product (truncated MRN) in RNS:" << endl;
+	cout << "    ==> : ";
+	printVector(MRNtoRNStrunc);
+	cout << endl;
 
-    return 0;
+	// final product from RNS to decimal - to check 
+
+	check = Conversions::RNStoDec(MRNtoRNStrunc,fractionalPartLength, modules);
+	cout << "Product (RNS) in Decimal:" << endl;
+	cout << "    ==> : "<< check<< endl;
+
+	return 0;
 }
-
-
-

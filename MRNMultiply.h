@@ -11,13 +11,12 @@ public:
     static vector<long>
     calculateIntermediateProduct(vector<long> xRNS, vector<long> yRNS, vector<long> modulesReversed);
 
-    static long long int findModulesProduct(vector<long> modules, long end);
+    static unsigned long long findModulesProduct(vector<long> modules, long end);
 
     static long findXParameterForMRNConversion(long pi, long pn);
 
-    static vector<long> calculateRNStoMRNConversionParameters(vector<long> modules, vector<long> modulesReversed,
-                                                              vector<long> intermediateProductReversed);
-
+    static vector<long> calculateRNStoMRNConversionParameters(vector<long> modules, vector<long> intermediateProductReversed);
+	static long long calculateMRNnumber(vector<long> modules, vector<long> intermediateProductReversed, vector<long> MRNparameters);
 };
 
 #endif //RNS_MULTIPLY_MRNMULTIPLY_H
