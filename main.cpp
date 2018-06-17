@@ -2,42 +2,74 @@
 #include <vector>
 #include "Conversions.h"
 #include "MRNMultiply.h"
-#include <string>
+#include <array>
 
 using namespace std;
 
+typedef __int128 int128;
+
 // Vectors for modules
-vector<long> modules = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31}; //37, 41, 43, 47, 53, 59, 61
+vector<long> modules = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
 vector<long> modulesReversed;
 
 // Number of modules for fractional part
 long fractionalPartLength = 7;
 
 // Machine values od x and y
-long long xMachineValue;
-long long yMachineValue;
+int128 xMachineValue;
+int128 yMachineValue;
 
 // RNS values of x and y
-vector<long> xRNS;
-vector<long> yRNS;
+vector<int128> xRNS;
+vector<int128> yRNS;
 
 // Intermediate product
-vector<long> intermediateProduct;
-vector<long> intermediateProductReversed;
+vector<int128> intermediateProduct;
+vector<int128> intermediateProductReversed;
 
 // Parameters required for MRN conversion
-vector<long> mrnConversionParameters;
-unsigned long long MRNnumber;
-vector<long> MRNtoRNS;
-unsigned long long truncatedMRN;
-vector<long> MRNtoRNStrunc;
+vector<int128> mrnConversionParameters;
+int128 MRNnumber;
+vector<int128> MRNtoRNS;
+int128 truncatedMRN;
+vector<int128> MRNtoRNStrunc;
 
 
 double check;
 
 
-// Works
+// Formating << operator to support int128 type
+static ostream &operator<<(ostream &dest, __int128_t value) {
+    ostream::sentry s(dest);
+    if (s) {
+        __uint128_t tmp = value < 0 ? -value : value;
+        char buffer[128];
+        char *d = std::end(buffer);
+        do {
+            --d;
+            *d = "0123456789"[tmp % 10];
+            tmp /= 10;
+        } while (tmp != 0);
+        if (value < 0) {
+            --d;
+            *d = '-';
+        }
+        int len = std::end(buffer) - d;
+        if (dest.rdbuf()->sputn(d, len) != len) {
+            dest.setstate(std::ios_base::badbit);
+        }
+    }
+    return dest;
+}
+
 void printVector(vector<long> vectorToPrint) {
+    cout << "[ ";
+    for (auto element: vectorToPrint)
+        cout << element << ' ';
+    cout << "]";
+}
+
+void printVector(vector<int128> vectorToPrint) {
     cout << "[ ";
     for (auto element: vectorToPrint)
         cout << element << ' ';
@@ -128,25 +160,27 @@ int main() {
     // Method prints itself
     mrnConversionParameters = MRNMultiply::calculateRNStoMRNConversionParameters(modules, intermediateProductReversed);
 
-	//mrn convesrion
+    // Performing MRN conversion
 	MRNnumber = MRNMultiply::calculateMRNnumber(modules, intermediateProductReversed, mrnConversionParameters);
-	cout <<"    == > MRN Number: " << MRNnumber<<endl;
+    cout << "    == > MRN Number: " << MRNnumber << endl;
 	MRNtoRNS = Conversions::machineValueToRNS(MRNnumber, modulesReversed);
 	cout << "Product (MRN) in RNS:" << endl;
 	cout << "    ==> : ";
 	printVector(MRNtoRNS);
 	cout << endl;
-	//truncate
+
+    // Truncating MRN number
 	truncatedMRN = Conversions::truncatedMRN(MRNnumber, fractionalPartLength, modules);
+
+    // Converting back to RNS
 	MRNtoRNStrunc = Conversions::machineValueToRNS(truncatedMRN, modulesReversed);
 	cout << "Product (truncated MRN) in RNS:" << endl;
 	cout << "    ==> : ";
 	printVector(MRNtoRNStrunc);
 	cout << endl;
 
-	// final product from RNS to decimal - to check 
-
-	check = Conversions::RNStoDec(MRNtoRNStrunc,fractionalPartLength, modules);
+    // Converting from RNS to decimal
+    check = Conversions::RNStoDec(MRNtoRNStrunc, fractionalPartLength, modules);
 	cout << "Product (RNS) in Decimal:" << endl;
 	cout << "    ==> : "<< check<< endl;
 

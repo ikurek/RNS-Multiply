@@ -4,17 +4,20 @@
 #include <vector>
 
 using namespace std;
+typedef __int128 int128;
+
 
 static class Conversions {
 public:
-    static vector<long> machineValueToRNS(unsigned long long  machineValue, vector<long> modules);
+    static vector<int128> machineValueToRNS(int128 machineValue, vector<long> modules);
 
-    static long long decimalToMachineValue(float number, long fractionalPartLength, vector<long> modules);
-	static unsigned long long truncatedMRN(unsigned long long MRNnumber, long fractionalPartLength, vector<long> modules);
+    static int128 decimalToMachineValue(float number, long fractionalPartLength, vector<long> modules);
+
+    static int128 truncatedMRN(int128 MRNnumber, long fractionalPartLength, vector<long> modules);
 
 
 	//static vector<long> findDecimalParameters(vector<long> modules);
-	static double RNStoDec(vector<long> rnsNum, int fractionalPartLength, vector<long> modules);
+    static double RNStoDec(vector<int128> rnsNum, int fractionalPartLength, vector<long> modules);
 };
 
 

@@ -1,10 +1,35 @@
 #include <iostream>
+#include <array>
 #include "Conversions.h"
 #include "MRNMultiply.h"
 
+// Formating << operator to support int128 type
+static ostream &operator<<(ostream &dest, __int128_t value) {
+    ostream::sentry s(dest);
+    if (s) {
+        __uint128_t tmp = value < 0 ? -value : value;
+        char buffer[128];
+        char *d = std::end(buffer);
+        do {
+            --d;
+            *d = "0123456789"[tmp % 10];
+            tmp /= 10;
+        } while (tmp != 0);
+        if (value < 0) {
+            --d;
+            *d = '-';
+        }
+        int len = std::end(buffer) - d;
+        if (dest.rdbuf()->sputn(d, len) != len) {
+            dest.setstate(std::ios_base::badbit);
+        }
+    }
+    return dest;
+}
+
 // Works
-vector<long> Conversions::machineValueToRNS(unsigned long long machineValue, vector<long> modules) {
-    vector<long> result;
+vector<int128> Conversions::machineValueToRNS(int128 machineValue, vector<long> modules) {
+    vector<int128> result;
 
     for (auto module: modules) {
         result.push_back(machineValue % module);
@@ -15,52 +40,52 @@ vector<long> Conversions::machineValueToRNS(unsigned long long machineValue, vec
     return result;
 }
 
-long long Conversions::decimalToMachineValue(float number, long fractionalPartLength, vector<long> modules) {
-    long long moduleProduct = 1;
+int128 Conversions::decimalToMachineValue(float number, long fractionalPartLength, vector<long> modules) {
+    int128 moduleProduct = 1;
 
     for (int i = 0; i < fractionalPartLength; ++i) {
         moduleProduct = moduleProduct * modules[i];
     }
 
-    long long result = number * moduleProduct;
+    int128 result = number * moduleProduct;
 
     return result;
 }
 
-unsigned long long Conversions::truncatedMRN(unsigned long long mrnNumber, long fractionalPartLength, vector<long> modules) {
-	long long moduleProduct = 1;
+int128 Conversions::truncatedMRN(int128 mrnNumber, long fractionalPartLength, vector<long> modules) {
+    int128 moduleProduct = 1;
 	for (int i = 0; i < fractionalPartLength; ++i) {
 		moduleProduct = moduleProduct * modules[i];
 	}
-	long long result = mrnNumber / moduleProduct;
+    int128 result = mrnNumber / moduleProduct;
 	return result;
 }
 
-double Conversions::RNStoDec(vector<long> rnsNum, int fractionalPartLength, vector<long> modules) {
-	unsigned long long allModProduct = MRNMultiply::findModulesProduct(modules, modules.size());
+double Conversions::RNStoDec(vector<int128> rnsNum, int fractionalPartLength, vector<long> modules) {
+    int128 allModProduct = MRNMultiply::findModulesProduct(modules, modules.size());
 	cout << "\n Big M: " << allModProduct << endl;
-	vector<long> paramM;
-	vector<long> paramB;
-	long param;
+    vector<int128> paramM;
+    vector<int128> paramB;
+    int128 param;
 	for (int i = 0; i < modules.size(); ++i) {
 		paramM.push_back(allModProduct / modules[i]);
 		param = MRNMultiply::findXParameterForMRNConversion(paramM[i], modules[i]);
 		paramB.push_back(param);
-	}	
-	
-	long long sum;
+	}
+
+    int128 sum;
 	for (int i = 0; i < modules.size(); ++i) {
 		sum += rnsNum[i] * paramB[i] * paramM[i];
 	}
 	sum %=allModProduct;
 
 	//find Rf - float modulo range
-	long long moduleProduct = 1;
+    int128 moduleProduct = 1;
 	for (int i = 0; i < fractionalPartLength; ++i) {
 		moduleProduct *= modules[i];
 	}
-	
-	double result = (double)sum / moduleProduct;
+
+    double result = (double) sum / moduleProduct;
 	return result;
 
 }

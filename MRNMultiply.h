@@ -5,18 +5,22 @@
 #include <iostream>
 
 using namespace std;
+typedef __int128 int128;
 
 static class MRNMultiply {
 public:
-    static vector<long>
-    calculateIntermediateProduct(vector<long> xRNS, vector<long> yRNS, vector<long> modulesReversed);
+    static vector<int128>
+    calculateIntermediateProduct(vector<int128> xRNS, vector<int128> yRNS, vector<long> modulesReversed);
 
-    static unsigned long long findModulesProduct(vector<long> modules, long end);
+    static int128 findModulesProduct(vector<long> modules, long end);
 
-    static long findXParameterForMRNConversion(long pi, long pn);
+    static int128 findXParameterForMRNConversion(int128 pi, int128 pn);
 
-    static vector<long> calculateRNStoMRNConversionParameters(vector<long> modules, vector<long> intermediateProductReversed);
-	static long long calculateMRNnumber(vector<long> modules, vector<long> intermediateProductReversed, vector<long> MRNparameters);
+    static vector<int128>
+    calculateRNStoMRNConversionParameters(vector<long> modules, vector<int128> intermediateProductReversed);
+
+    static int128
+    calculateMRNnumber(vector<long> modules, vector<int128> intermediateProductReversed, vector<int128> MRNparameters);
 };
 
 #endif //RNS_MULTIPLY_MRNMULTIPLY_H
